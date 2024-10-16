@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import connection from './database/db.js';
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import serviceRouter from './routes/serviceRoutes.js';
+import bookingRouter from './routes/bookingRoutes.js'
 
 dotenv.config();
 
@@ -24,8 +26,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // API routes
 app.use('/api/auth',authRoutes);
 app.use('/api/admin',adminRoutes);
-
-
+app.use('/api/service',serviceRouter);
+app.use('/api/booking',bookingRouter);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);

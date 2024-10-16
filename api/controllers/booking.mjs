@@ -1,15 +1,7 @@
 import Service from '../models/Service.mjs';
 import Booking from '../models/Booking.mjs';
-// Get all services
-export const getAllServices = async (req, res) => {
-    try {
-        const services = await Service.find();
-        res.status(200).json(services);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
-
+import emailService from '../services/emailService.mjs';
+import User from '../models/User.mjs'
 export const createBooking = async (req, res) => {
     const { serviceId, bookingDates } = req.body; 
     const numberOfDays = bookingDates.length;
@@ -50,8 +42,10 @@ export const createBooking = async (req, res) => {
             totalPrice: service.pricePerDay * numberOfDays 
         });
 
-        await booking.save();
-
+        let newbooking=await booking.save();
+        newbooking = await newbooking.populate(['serviceId', 'userId']);
+        console.log(newbooking);        
+        await emailService.sendBookingConfirmation(newbooking);
         res.status(201).json({ message: 'Booking created successfully', booking });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -59,8 +53,9 @@ export const createBooking = async (req, res) => {
 };
 
 export const getUserBookings = async (req, res) => {
-    const { userId } = req.userId;
-
+    const userId  = req.userId;
+    console.log(userId);
+    
     try {
         const bookings = await Booking.find({ userId }).populate('serviceId');
         res.status(200).json(bookings);
@@ -69,38 +64,3 @@ export const getUserBookings = async (req, res) => {
     }
 };
 
-export const filterServices = async (req, res) => {
-    const { minPrice, maxPrice, category, location, bookingDate } = req.query;
-    console.log(req.query)
-    const query = {};
-  
-    if (minPrice || maxPrice) {
-        query.pricePerDay = {};
-        if (minPrice) {
-            query.pricePerDay.$gte = Number(minPrice);
-        }
-        if (maxPrice) {
-            query.pricePerDay.$lte = Number(maxPrice);
-        }
-    }
-  
-    if (category) {
-        query.category = category;
-    }
-  
-    if (location) {
-        query.location = location;
-    }
-  
-    if (bookingDate) {
-        const date = new Date(bookingDate);
-        query.availabilityDates = { $elemMatch: { $gte: date } }; // Check if the booking date is available
-    }
-  
-    try {
-        const services = await Service.find(query);
-        res.status(200).json(services);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
