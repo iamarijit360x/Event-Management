@@ -1,0 +1,33 @@
+{
+  "name": "event-booking-platform",
+  "type": "module",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "event-booking-platform": "file:",
+    "express": "^4.21.1",
+    "express-validator": "^7.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.1",
+    "nodemailer": "^6.9.15"
+  },
+  "devDependencies": {
+    "eslint": "^9.12.0",
+    "eslint-define-config": "^2.1.0",
+    "globals": "^15.11.0",
+    "nodemon": "^3.1.7"
+  }
+}
