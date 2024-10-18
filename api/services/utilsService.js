@@ -1,17 +1,17 @@
-import jwt from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
 
-class UtilityService{
-    async generateToken(user){
+class UtilityService {
+    async generateToken(user) {
         const payload = {
-            id: user._id,  
+            id: user._id,
             email: user.email,
             name: user.name,
-            isAdmin:user.isAdmin
+            isAdmin: user.isAdmin
         };
         return jwt.sign(payload, process.env.SECRET, {
             expiresIn: '1h'
         });
-
     }
 }
-export default new UtilityService();
+
+module.exports = new UtilityService();

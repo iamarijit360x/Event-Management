@@ -1,8 +1,9 @@
-import Service from '../models/Service.mjs';
-import Booking from '../models/Booking.mjs';
-import emailService from '../services/emailService.mjs';
-import User from '../models/User.mjs'
-export const createBooking = async (req, res) => {
+const Service = require('../models/Service');
+const Booking = require('../models/Booking');
+const emailService = require('../services/emailService');
+const User = require('../models/User');
+
+exports.createBooking = async (req, res) => {
     const { serviceId, bookingDates } = req.body; 
     const numberOfDays = bookingDates.length;
     const userId = req.userId;
@@ -42,18 +43,18 @@ export const createBooking = async (req, res) => {
             totalPrice: service.pricePerDay * numberOfDays 
         });
 
-        let newbooking=await booking.save();
-        newbooking = await newbooking.populate(['serviceId', 'userId']);
-        console.log(newbooking);        
-        await emailService.sendBookingConfirmation(newbooking);
-        res.status(201).json({ message: 'Booking created successfully', booking });
+        let newBooking = await booking.save();
+        newBooking = await newBooking.populate(['serviceId', 'userId']);
+        console.log(newBooking);        
+        await emailService.sendBookingConfirmation(newBooking);
+        res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
-export const getUserBookings = async (req, res) => {
-    const userId  = req.userId;
+exports.getUserBookings = async (req, res) => {
+    const userId = req.userId;
     console.log(userId);
     
     try {
@@ -63,4 +64,3 @@ export const getUserBookings = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-

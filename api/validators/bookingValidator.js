@@ -1,6 +1,6 @@
-import { body } from 'express-validator';
+const { body } = require('express-validator');
 
-export const bookingValidator = [
+exports.bookingValidator = [
     // Validation rules
     body('serviceId').isMongoId().withMessage('Invalid service ID'),
     body('bookingDates').isArray({ min: 1 }).withMessage('Booking dates must be an array with at least one date'),

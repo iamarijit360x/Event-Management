@@ -1,6 +1,5 @@
-import { body } from 'express-validator';
-
-export const validateSignup = [
+const { body } = require('express-validator');
+exports.validateSignup = [
     body('email')
         .isEmail()
         .withMessage('Please enter a valid email address'),
@@ -13,7 +12,7 @@ export const validateSignup = [
         .withMessage('Name is required')
 ];
 
-export const validateSignin = [
+exports.validateSignin = [
     body('email')
         .isEmail()
         .withMessage('Please enter a valid email address'),

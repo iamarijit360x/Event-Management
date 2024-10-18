@@ -1,21 +1,23 @@
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
-import bookingConfirmationEmail from '../template/bookingConfirmation.mjs'
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+const bookingConfirmationEmail = require('../template/bookingConfirmation');
+
 dotenv.config();
+
 class EmailService {
     constructor() {
         this.transporter = nodemailer.createTransport({
             service: 'Gmail', 
             auth: {
                 user: process.env.EMAIL,
-                pass:  process.env.EMAIL_PASSWORD
+                pass: process.env.EMAIL_PASSWORD
             }
         });
     }
 
-    async sendEmail(to,subject,htmlContent,cc='') {
+    async sendEmail(to, subject, htmlContent, cc = '') {
         const mailOptions = {
-            from:process.env.EMAIL,
+            from: process.env.EMAIL,
             to,
             cc,
             subject,
@@ -30,10 +32,11 @@ class EmailService {
             throw new Error('Email sending failed');
         }
     }
+
     async sendBookingConfirmation(bookingDetails) {
-        const htmlContent=bookingConfirmationEmail(bookingDetails);
-        this.sendEmail(bookingDetails.userId.email,'Booking Confirmed',htmlContent);
+        const htmlContent = bookingConfirmationEmail(bookingDetails);
+        this.sendEmail(bookingDetails.userId.email, 'Booking Confirmed', htmlContent);
     }
 }
 
-export default new EmailService();
+module.exports = new EmailService();

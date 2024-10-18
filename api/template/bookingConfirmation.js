@@ -6,6 +6,7 @@ const formatDate = (dateString) => {
 const bookingConfirmationEmail = (bookingData) => {
     const { serviceId, bookingDates, totalPrice, userId } = bookingData;
     const formattedDates = bookingDates.map((date) => formatDate(date)).join(' - ');
+
     return `<!DOCTYPE html>
     <html>
     <head>
@@ -90,20 +91,15 @@ const bookingConfirmationEmail = (bookingData) => {
     </head>
     <body>
         <div class="container">
-            <!-- Header -->
             <div class="header">
                 <img src="logo" alt="Company Logo" />
                 <h1>Thanks ${userId?.name} for Booking!</h1>
             </div>
-            
-            <!-- Content -->
             <div class="content">
                 <h2>Your Booking is Confirmed</h2>
                 <p>Your booking for <strong>${serviceId.title}</strong> has been successfully confirmed.</p>
                 <div class="countdown">Your experience starts on: <br> ${formatDate(bookingDates[0])}</div>
             </div>
-            
-            <!-- Booking Info -->
             <div class="booking-info">
                 <h3>Booking Details</h3>
                 <p><strong>Service:</strong> ${serviceId.title}</p>
@@ -112,14 +108,9 @@ const bookingConfirmationEmail = (bookingData) => {
                 <p><strong>Location:</strong> ${serviceId.location}</p>
                 <p><strong>Contact:</strong> ${serviceId?.contactDetails?.email} | ${serviceId.contactDetails?.phone}</p>
             </div>
-            
-            <!-- CTA Buttons -->
             <div class="content">
                 <a href="https://calendar.google.com" class="cta">Add to Google Calendar</a>
-            
             </div>
-            
-            <!-- Footer -->
             <div class="footer">
                 <p>&copy; 2024 Your Company. All rights reserved.</p>
                 <p><a href="#">Contact Us</a> | <a href="#">Terms & Privacy</a></p>
@@ -128,4 +119,5 @@ const bookingConfirmationEmail = (bookingData) => {
     </body>
     </html>`;
 };
-export default bookingConfirmationEmail;
+
+module.exports = bookingConfirmationEmail;

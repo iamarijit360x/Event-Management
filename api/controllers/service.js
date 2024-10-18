@@ -1,7 +1,8 @@
-import Service from '../models/Service.mjs';
-import Booking from '../models/Booking.mjs';
+const Service = require('../models/Service');
+const Booking = require('../models/Booking');
+
 // Get all services
-export const getAllServices = async (req, res) => {
+exports.getAllServices = async (req, res) => {
     try {
         const services = await Service.find();
         res.status(200).json(services);
@@ -10,7 +11,7 @@ export const getAllServices = async (req, res) => {
     }
 };
 
-export const createBooking = async (req, res) => {
+exports.createBooking = async (req, res) => {
     const { serviceId, bookingDates } = req.body; 
     const numberOfDays = bookingDates.length;
     const userId = req.userId;
@@ -58,8 +59,8 @@ export const createBooking = async (req, res) => {
     }
 };
 
-export const getUserBookings = async (req, res) => {
-    const { userId } = req.userId;
+exports.getUserBookings = async (req, res) => {
+    const userId = req.userId;
 
     try {
         const bookings = await Booking.find({ userId }).populate('serviceId');
@@ -69,9 +70,9 @@ export const getUserBookings = async (req, res) => {
     }
 };
 
-export const filterServices = async (req, res) => {
+exports.filterServices = async (req, res) => {
     const { minPrice, maxPrice, category, location, bookingDate } = req.query;
-    console.log(req.query)
+    console.log(req.query);
     const query = {};
   
     if (minPrice || maxPrice) {
@@ -94,7 +95,7 @@ export const filterServices = async (req, res) => {
   
     if (bookingDate) {
         const date = new Date(bookingDate);
-        query.availabilityDates = { $elemMatch: { $gte: date } }; // Check if the booking date is available
+        query.availableDates = { $elemMatch: { $gte: date } }; // Check if the booking date is available
     }
   
     try {

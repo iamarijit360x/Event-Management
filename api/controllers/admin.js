@@ -1,8 +1,7 @@
-import Service from '../models/Service.mjs';
-
+const Service = require('../models/Service');
 
 // Create a service
-export const createService = async (req, res) => {
+exports.createService = async (req, res) => {
     const { title, category, pricePerDay, description, availabilityDates, location, contactDetails } = req.body;
     
     // Validate required fields

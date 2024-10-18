@@ -1,13 +1,15 @@
-import express from 'express';
-import validateRequest from '../middlewares/validatorMiddleware.mjs';
-import { verifyAdmin, verifyUser } from '../middlewares/authMiddleware.mjs';
-import { createBooking, getUserBookings } from '../controllers/booking.mjs';
-import { bookingValidator } from '../validators/bookingValidator.mjs';
+const express = require('express');
+const validateRequest = require('../middlewares/validatorMiddleware');
+const { verifyAdmin, verifyUser } = require('../middlewares/authMiddleware');
+const { createBooking, getUserBookings } = require('../controllers/booking');
+const { bookingValidator } = require('../validators/bookingValidator');
+
 const router = express.Router();
+
 router.use(verifyUser);
 
-router.post('/',bookingValidator,validateRequest,createBooking);
-router.get('/',getUserBookings);
+router.post('/', bookingValidator, validateRequest, createBooking);
+router.get('/', getUserBookings);
 // router.use(verifyAdmin);
 
-export default router;
+module.exports = router;

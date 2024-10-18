@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const contactSchema = new mongoose.Schema({
     email: {
@@ -18,13 +18,13 @@ const serviceSchema = new mongoose.Schema({
     category: { type: String, required: true },
     pricePerDay: { type: Number, required: true, min: 0 }, 
     description: { type: String },
-    availableDates: [Date], // Consider how you will manage these dates
+    availableDates: [Date],
     location: { type: String, required: true },
     contactDetails: contactSchema
 });
 
 // Optionally add indexes
-serviceSchema.index({ category: 1, location: 1 }); // Example indexing
+serviceSchema.index({ category: 1, location: 1 });
 
 const Service = mongoose.model('Service', serviceSchema);
-export default Service;
+module.exports = Service;
