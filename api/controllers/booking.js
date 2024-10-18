@@ -52,15 +52,31 @@ exports.createBooking = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-
 exports.getUserBookings = async (req, res) => {
     const userId = req.userId;
-    console.log(userId);
-    
+    const { page = 1, limit = 10, sortBy = 'bookingDate', sortOrder = 'asc' } = req.query; // Add query parameters
+
     try {
-        const bookings = await Booking.find({ userId }).populate('serviceId');
-        res.status(200).json(bookings);
+        const sortOptions = {};
+        sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1; // Set sorting order
+
+        const bookings = await Booking.find({ userId })
+            .populate('serviceId')
+            .sort(sortOptions) // Apply sorting
+            .skip((page - 1) * limit) // Calculate how many documents to skip
+            .limit(Number(limit)); // Limit the number of results
+
+        // Optionally, get the total count of bookings
+        const totalBookings = await Booking.countDocuments({ userId });
+        const totalPages = Math.ceil(totalBookings / limit);
+
+        res.status(200).json({
+            totalPages,
+            currentPage: Number(page),
+            bookings,
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+

@@ -2,62 +2,32 @@ const Service = require('../models/Service');
 const Booking = require('../models/Booking');
 
 // Get all services
-exports.getAllServices = async (req, res) => {
-    try {
-        const services = await Service.find();
-        res.status(200).json(services);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
+// exports.getAllServices = async (req, res) => {
+//     try {
+//         const { page = 1, limit = 10, sortBy = 'pricePerDay', sortOrder = 'asc' } = req.query;
 
-exports.createBooking = async (req, res) => {
-    const { serviceId, bookingDates } = req.body; 
-    const numberOfDays = bookingDates.length;
-    const userId = req.userId;
+//         const sortOptions = {};
+//         sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1; // 1 for ascending, -1 for descending
 
-    if (!serviceId || !bookingDates || numberOfDays === 0) {
-        return res.status(400).json({ message: 'Invalid request: serviceId and bookingDates are required.' });
-    }
+//         const services = await Service.find()
+//             .sort(sortOptions)
+//             .skip((page - 1) * limit) // Calculate how many documents to skip
+//             .limit(Number(limit)); // Limit the number of results
 
-    try {
-        const service = await Service.findById(serviceId);
-        if (!service) {
-            return res.status(404).json({ message: 'Service not found' });
-        }
+//         // Optionally, you might want to get the total count of services
+//         const totalServices = await Service.countDocuments();
+//         const totalPages = Math.ceil(totalServices / limit);
 
-        // Normalize dates to YYYY-MM-DD format for comparison
-        const normalizedBookingDates = bookingDates.map((date) => new Date(date).toISOString().split('T')[0]);
-        const normalizedAvailableDates = service.availableDates.map((date) => new Date(date).toISOString().split('T')[0]);
+//         res.status(200).json({
+//             totalPages,
+//             currentPage: Number(page),
+//             services,
+//         });
+//     } catch (error) {
+//         res.status(500).json({ message: 'Server error', error: error.message });
+//     }
+// };
 
-        // Check for date availability
-        const unavailableDates = normalizedBookingDates.filter((date) => !normalizedAvailableDates.includes(date));
-        if (unavailableDates.length > 0) {
-            return res.status(400).json({
-                message: 'Some booking dates are not available',
-                unavailableDates,
-                availableDates: normalizedAvailableDates
-            });
-        }
-
-        // Update the service's available dates
-        service.availableDates = normalizedAvailableDates.filter((date) => !normalizedBookingDates.includes(date));
-        await service.save(); // Save the updated service
-
-        const booking = new Booking({
-            userId,
-            serviceId,
-            bookingDates: normalizedBookingDates, // store normalized booking dates
-            totalPrice: service.pricePerDay * numberOfDays 
-        });
-
-        await booking.save();
-
-        res.status(201).json({ message: 'Booking created successfully', booking });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
 
 exports.getUserBookings = async (req, res) => {
     const userId = req.userId;
@@ -71,8 +41,8 @@ exports.getUserBookings = async (req, res) => {
 };
 
 exports.filterServices = async (req, res) => {
-    const { minPrice, maxPrice, category, location, bookingDate } = req.query;
-    console.log(req.query);
+    const { minPrice, maxPrice, category, location, bookingDate, page = 1, limit = 10, sortBy = 'pricePerDay', sortOrder = 'asc' } = req.query;
+
     const query = {};
   
     if (minPrice || maxPrice) {
@@ -99,9 +69,59 @@ exports.filterServices = async (req, res) => {
     }
   
     try {
-        const services = await Service.find(query);
-        res.status(200).json(services);
+        const sortOptions = {};
+        sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1; // Sorting order
+
+        const services = await Service.find(query)
+            .sort(sortOptions)
+            .skip((page - 1) * limit)
+            .limit(Number(limit));
+
+        // Total count for pagination
+        const totalServices = await Service.countDocuments(query);
+        const totalPages = Math.ceil(totalServices / limit);
+
+        res.status(200).json({
+            totalPages,
+            currentPage: Number(page),
+            services,
+        });
     } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+
+
+exports.createService = async (req, res) => {
+    const { title, category, pricePerDay, description, availabilityDates, location, contactDetails } = req.body;
+    
+    // Validate required fields
+    if (!title || !category || !pricePerDay || !description || !availabilityDates || !location || !contactDetails) {
+        return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    // Validate price
+    if (pricePerDay <= 0) {
+        return res.status(400).json({ message: 'Price per day must be greater than zero.' });
+    }
+
+    try {
+        // Create the service
+        const service = await Service.create({
+            title,
+            category,
+            pricePerDay,
+            description,
+            availabilityDates,
+            location,
+            contactDetails,
+            createdBy:req.userId
+        });
+        
+        res.status(201).json(service);
+    } catch (error) {
+        // Handle potential errors during service creation
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };

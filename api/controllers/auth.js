@@ -1,17 +1,15 @@
 const User = require('../models/User');
-const UtilityService = require('../services/utilsService');
+const authService = require('../services/authService');
 const bcrypt = require('bcrypt');
 
 exports.signup = async (req, res) => {
     const { name, email, password } = req.body;
     try {
-        const user = await User.create({ name, email, password });
-        const token = await UtilityService.generateToken(user);
-        res.status(201).json({ token });
+        const obj=await authService.createUser(name, email, password)
+        obj.message='Account Created Successfully'
+        return res.status(201).json(obj)
     } catch (error) {
-        if (error.code === 11000) 
-            return res.status(429).json({ message: 'Email already exists. Please use another email.' }); 
-        return res.status(500).json({ message: error.message });
+       return res.status(error.status).json(error)
     }
 };
 
@@ -22,7 +20,7 @@ exports.signin = async (req, res) => {
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
-        const token = await UtilityService.generateToken(user);
+        const token = await authService.generateToken(user);
         return res.status(200).json({ token });
     } catch (error) {
         return res.status(500).json({ message: error.message });

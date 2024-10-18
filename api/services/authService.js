@@ -1,23 +1,33 @@
-import User from '../models/User.mjs';
+const User = require("../models/User");
+const jwt = require('jsonwebtoken');
 
-export const signup = async (req, res) =>  {
-    const { name, email, password } = req.body;
-    try {
-        const user = await User.create({ name, email, password });
-        res.status(201).json({ user, token: generateToken(user._id) });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
+
+class AuthService {
+    async generateToken(user) {
+        const payload = {
+            id: user._id,
+            email: user.email,
+            name: user.name,
+            isAdmin: user.isAdmin
+        };
+        return jwt.sign(payload, process.env.SECRET, {
+            expiresIn: '1h'
+        });
     }
-};
-export const signin = async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const user = await User.findOne({ email });
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+    async createUser(name, email, password, isAdmin = false) {
+        try {
+            const user = await User.create({ name, email, password, isAdmin });
+            const token = await this.generateToken(user);
+            return { token, user }; // Return both token and user information (optional)
+        } catch (error) {
+            console.log(error);
+            
+            if (error.code === 11000) {
+                throw ({message:'Email already exists. Please use another email.',error,status:409}); // Simpler error message
+            }
+            throw new Error({message:'Error While Creating Account',error,status:500}); // General error message
         }
-        res.json({ token: generateToken(user._id) });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
     }
-};
+}
+
+module.exports = new AuthService();

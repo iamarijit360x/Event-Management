@@ -20,7 +20,8 @@ const serviceSchema = new mongoose.Schema({
     description: { type: String },
     availableDates: [Date],
     location: { type: String, required: true },
-    contactDetails: contactSchema
+    contactDetails: contactSchema,
+    createdBy: { type: mongoose.Schema.Types.ObjectId,ref:'User',required: true }
 });
 
 // Optionally add indexes
