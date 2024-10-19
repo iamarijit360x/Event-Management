@@ -91,24 +91,4 @@ exports.filterServices = async (req, res) => {
 
 
 
-exports.createService = async (req, res) => {
-    const { title, category, pricePerDay, description, availabilityDates, location, contactDetails } = req.body;
-    try {
-        // Create the service
-        const service = await Service.create({
-            title,
-            category,
-            pricePerDay,
-            description,
-            availabilityDates,
-            location,
-            contactDetails,
-            createdBy:req.userId
-        });
-        
-        res.status(201).json(service);
-    } catch (error) {
-        // Handle potential errors during service creation
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
+

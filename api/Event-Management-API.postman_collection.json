@@ -1,0 +1,357 @@
+{
+	"info": {
+		"_postman_id": "de43cd05-abab-464b-a515-e090943eeb5e",
+		"name": "Event-Management-API",
+		"description": "This API provides endpoints for managing services, bookings, and user authentication in an event management system. It includes:\n\n- **Service Management**: Create, edit, delete, and filter services (admin access required).\n    \n- **Booking Management**: Create and retrieve user bookings (user access required).\n    \n- **User Authentication**: Sign up and sign in users with validation.\n    \n\nUtilized appropriate middleware for authentication and request validation to ensure secure and reliable operations.\n\nIMPORTANT: All the routes except sign-in and sign-up requires authorization token in the header (**Authorization**) in order to access the informantion .",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31944161"
+	},
+	"item": [
+		{
+			"name": "User Sign Up",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \r\n    \"name\":\"User1\",\r\n    \"email\":\"user1@gmail.com\",\r\n    \"password\":\"user1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3015/api/auth/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3015",
+					"path": [
+						"api",
+						"auth",
+						"signup"
+					]
+				},
+				"description": "Endpoint for creating a user account.\n\nRequires Name,Email,Password in request body."
+			},
+			"response": []
+		},
+		{
+			"name": "Sign in",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"abcd@gmail.com\",\r\n    \"password\":\"abcd@123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3015/api/auth/signin",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3015",
+					"path": [
+						"api",
+						"auth",
+						"signin"
+					]
+				},
+				"description": "Endpoint for sign in a user.\n\nRequires Email,Password to Sign in and get the authorization token"
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch All Services",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MTM2YTBmMDljMzE4YmNmM2JmZWI0NiIsImVtYWlsIjoidXNlcjJAZ21haWwuY29tIiwibmFtZSI6IlVzZXIyIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTcyOTM1NTgyNywiZXhwIjoxNzI5NjE1MDI3fQ.2DCssmQGBV7CiMDi3t5_Bg66-KQJeX0oXKAhpxlM8cs",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3015/api/service",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3015",
+					"path": [
+						"api",
+						"service"
+					]
+				},
+				"description": "## Filter Services\n\n### Endpoint\n\n```\nGET /api/service\n\n ```\n\n### Description\n\nThis endpoint allows users to filter services based on various criteria such as price, category, location, and availability. The user can filter by a range of dates (startDate and/or endDate), price range, and other parameters.\n\n### Query Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `minPrice` | Number | (Optional) Minimum price per day of the service. |\n| `maxPrice` | Number | (Optional) Maximum price per day of the service. |\n| `category` | String | (Optional) Filter services by category. Case-insensitive. |\n| `location` | String | (Optional) Filter services by location. Case-insensitive. |\n| `startDate` | Date | (Optional) Show services available on or after this date. Format: YYYY-MM-DD. |\n| `endDate` | Date | (Optional) Show services available before or on this date. Format: YYYY-MM-DD. |\n| `page` | Number | (Optional) Pagination: Page number (default is `1`). |\n| `limit` | Number | (Optional) Pagination: Number of results per page (default is `10`). |\n| `sortBy` | String | (Optional) Field to sort by, default is `pricePerDay`. |\n| `sortOrder` | String | (Optional) Sorting order: `asc` (ascending) or `desc` (descending), default is `asc`. |\n\n### Request Examples\n\n#### 1\\. Get Services Available on or After a Specific Date\n\n```\nGET /api/service?startDate=2024-10-20\n\n ```\n\n#### 2\\. Get Services Between a Date Range\n\n```\nGET /api/service?startDate=2024-10-20&endDate=2024-10-30\n\n ```\n\n#### 3\\. Get Services by Price Range and Location\n\n```\nGET /api/service?minPrice=100&maxPrice=500&location=springfield\n\n ```\n\n#### 4\\. Get All Services Sorted by Price (Descending)\n\n```\nGET /api/service?sortBy=pricePerDay&sortOrder=desc\n\n ```\n\n### Date Handling\n\n- **startDate**: If only a `startDate` is provided, the API returns services available from that date onward.\n    \n    - If `startDate` is in the past, it defaults to today’s date, showing only future availability.\n        \n- **endDate**: If only an `endDate` is provided, the API returns services available between today and the given `endDate`.\n    \n- **startDate and endDate**: If both are provided, the API shows services available within that date range. If the `startDate` is earlier than today, it defaults to today."
+			},
+			"response": []
+		},
+		{
+			"name": "Book Service",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MTAxZWQ0ZDYwYzliYzI1NzQ2MDI2NCIsImVtYWlsIjoiYXJpaml0LmJhbmR5b3M3QGdtYWlsLmNvbSIsIm5hbWUiOiJKaWdpc2hhIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTcyOTEwOTcxNiwiZXhwIjoxNzI5MTEzMzE2fQ.99h5h7DrAlIGQNqXI4D8UMiUw-AvN-uOz5ZjzSNIgF0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"serviceId\": \"671007039a85a81093b6bf89\", \r\n    \"bookingDates\": [\r\n        \"2024-11-05\",\r\n        \"2024-11-06\"\r\n    ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3015/api/booking",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3015",
+					"path": [
+						"api",
+						"booking"
+					]
+				},
+				"description": "Endpoint for booking a service.\n\nRequires serviceId and booking Dates in the Request body"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Booking as a User",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MGVjNGFjYWQwODY4MDliMjJjODkwOCIsImVtYWlsIjoiYWJjZEBnbWFpbC5jb20iLCJuYW1lIjoiQXJpaml0IEJhbmVyamVlIiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNzI5MTA2NTE5LCJleHAiOjE3MjkxMTAxMTl9.t8qRvPfi5CJ4uAfoHJVEYExsRxGbBldGbghmbpIUUK0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3015/api/booking",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3015",
+					"path": [
+						"api",
+						"booking"
+					]
+				},
+				"description": "Returns all the booking done by a user ."
+			},
+			"response": []
+		},
+		{
+			"name": "Signup (Admin )",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \r\n    \"name\":\"Admin3\",\r\n    \"email\":\"admin3@gmail.com\",\r\n    \"password\":\"admin123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3015/api/admin/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3015",
+					"path": [
+						"api",
+						"admin",
+						"signup"
+					]
+				},
+				"description": "Creates admin user. Requires name,email.password."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Service (Admin)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MTM2YTQ5MDljMzE4YmNmM2JmZWI0YyIsImVtYWlsIjoiYWRtaW4xQGdtYWlsLmNvbSIsIm5hbWUiOiJBZG1pbjEiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3MjkzMzU0NDgsImV4cCI6MTcyOTU5NDY0OH0.iW6t-SxDQEkqRG5VfLL8jnwMSeOXFM3x_LG8UjKrtVs",
+						"description": "Authorization Token \n",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Italian Cooking Class\",\r\n    \"category\": \"Cooking\",\r\n    \"pricePerDay\": 75,\r\n    \"description\": \"Learn to cook authentic Italian dishes from scratch.\",\r\n    \"availabilityDates\": [\r\n        \"2024-11-10\",\r\n        \"2024-11-11\"\r\n    ],\r\n    \"location\": \"Culinary Arts Center, CA\",\r\n    \"contactDetails\": {\r\n        \"email\": \"classes@culinaryarts.com\",\r\n        \"phone\": \"+14155567890\"\r\n    }\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3015/api/admin/service",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3015",
+					"path": [
+						"api",
+						"admin",
+						"service"
+					]
+				},
+				"description": "End point for creating a service"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Service (Admin)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MTM2YTQ5MDljMzE4YmNmM2JmZWI0YyIsImVtYWlsIjoiYWRtaW4xQGdtYWlsLmNvbSIsIm5hbWUiOiJBZG1pbjEiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3MjkzMzQxMTMsImV4cCI6MTcyOTMzNzcxM30.0gUTkQwJOFnTChy5_WL0gCmMqfl8qz7iYmbJ9C4BgjU",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "http://localhost:3015/api/admin/service/67136b5409c318bcf3bfeb51",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3015",
+					"path": [
+						"api",
+						"admin",
+						"service",
+						"67136b5409c318bcf3bfeb51"
+					]
+				},
+				"description": "End point for deleting a service"
+			},
+			"response": []
+		},
+		{
+			"name": "Edit Service (Admin)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MTM2YTQ5MDljMzE4YmNmM2JmZWI0YyIsImVtYWlsIjoiYWRtaW4xQGdtYWlsLmNvbSIsIm5hbWUiOiJBZG1pbjEiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3MjkzMjU4NTUsImV4cCI6MTcyOTMyOTQ1NX0.wr56Neuh8zbNs7Bk5r9_W3h8yKgxWH9PpwexhW-YLYk",
+						"description": "Authorization Token \n",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"location\": \"New Updated Location Address\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3015/api/admin/service/67136b5409c318bcf3bfeb51",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3015",
+					"path": [
+						"api",
+						"admin",
+						"service",
+						"67136b5409c318bcf3bfeb51"
+					]
+				},
+				"description": "End pointn for edit a service. At least a single field is required in order to update a service."
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Booking (Admin)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MTM2YTQ5MDljMzE4YmNmM2JmZWI0YyIsImVtYWlsIjoiYWRtaW4xQGdtYWlsLmNvbSIsIm5hbWUiOiJBZG1pbjEiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3MjkzMzY0MzYsImV4cCI6MTcyOTU5NTYzNn0.w_CulvV4zAQPoh5uy3kBPUXBmDzk655Tgn2rkN8zTkY",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3015/api/admin/booking/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3015",
+					"path": [
+						"api",
+						"admin",
+						"booking",
+						""
+					]
+				},
+				"description": "Get all booking of a single admin services."
+			},
+			"response": []
+		}
+	]
+}

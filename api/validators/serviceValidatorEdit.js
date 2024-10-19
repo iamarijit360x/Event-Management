@@ -3,20 +3,20 @@ const utilsService = require('../services/utilsService');
 
 const validateEditService = [
     param('serviceId')
-    .custom(value => {
-        if (!utilsService.isObjectId(value)) {
-            throw new Error('Invalid ObjectId.');
-        }
-        return true;
-    })
+        .custom((value) => {
+            if (!utilsService.isObjectId(value)) {
+                throw new Error('Invalid ObjectId.');
+            }
+            return true;
+        })
     ,
     body()
-        .custom(value => {
-        if (Object.keys(value).length === 0) {
-            throw new Error('At least one field must be provided for editing.');
-        }
-        return true;
-    }),
+        .custom((value) => {
+            if (Object.keys(value).length === 0) {
+                throw new Error('At least one field must be provided for editing.');
+            }
+            return true;
+        }),
     
     body('title')
         .optional()
@@ -52,7 +52,7 @@ const validateEditService = [
         .optional()
         .isObject()
         .withMessage('Contact details must be an object.')
-        .custom(contactDetails => {
+        .custom((contactDetails) => {
             if (!contactDetails.email || !contactDetails.phone) {
                 throw new Error('Contact details must include both email and phone.');
             }

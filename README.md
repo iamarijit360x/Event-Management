@@ -4,13 +4,12 @@
 This project is a backend system for an event booking platform that allows users to book services such as venues, hotels, caterers, cameramen, DJs, etc. The platform includes user and admin features for managing bookings and services.
 
 ## Technology Stack
-- **Node.js**
-- **Express.js**
-- **MongoDB** (or any relational database like PostgreSQL/MySQL)
+- **Node.js** Runtime Env
+- **Express.js** Framework
+- **MongoDB** Database
 - **JWT** for authentication
-- **dotenv** for environment variable management
-- **body-parser** for parsing incoming request bodies
-- **cors** for handling Cross-Origin Resource Sharing
+- **Express Validator** for data validation
+- **Jest** for Tesing
 
 ## Features
 ### User Features
@@ -33,8 +32,9 @@ This project is a backend system for an event booking platform that allows users
 ### Other Functionalities
 - Search and filter services
 - Calculate total booking price based on duration
-- Implement pagination and sorting for the services list
-- Send email notifications for booking confirmations
+- **Implemented pagination and sorting for the services list**
+- **Send email notifications for booking confirmations**
+- **Send email to all booked users on cancellation of a event.**
 
 ## Installation
 1. Clone the repository: `git clone https://github.com/iamarijit360x/Event-Management.git`
