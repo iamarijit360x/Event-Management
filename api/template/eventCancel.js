@@ -4,8 +4,10 @@ const formatDate = (dateString) => {
 };
 
 const eventCancellationEmail = (cancellationData) => {
-    const { eventId, refundAmount, userId, cancellationDate } = cancellationData;
-
+    
+    const {title,location,contactDetails}=cancellationData.serviceId;
+    const name=cancellationData.userId.name;
+    const refundAmount=cancellationData.totalPrice;
     return `<!DOCTYPE html>
     <html>
     <head>
@@ -85,12 +87,12 @@ const eventCancellationEmail = (cancellationData) => {
             </div>
             <div class="content">
                 <h2>Your Event Has Been Canceled</h2>
-                <p>Hello ${userId?.name},</p>
-                <p>We regret to inform you that your booking for <strong>${eventId.title}</strong> scheduled for <strong>${formatDate(cancellationDate)}</strong> has been canceled.</p>
+                <p>Hello ${name},</p>
+                <p>We regret to inform you that your booking for <strong>${title}</strong> scheduled for <strong>${formatDate(new Date())}</strong> has been canceled.</p>
                 <ul>
                     <li>Refund amount: <strong>$${refundAmount}</strong></li>
-                    <li>Location: <strong>${eventId.location}</strong></li>
-                    <li>Contact: <strong>${eventId.contactDetails?.email} | ${eventId.contactDetails?.phone}</strong></li>
+                    <li>Location: <strong>${location}</strong></li>
+                    <li>Contact: <strong>${contactDetails?.email} | ${contactDetails?.phone}</strong></li>
                 </ul>
             </div>
             <div class="content">

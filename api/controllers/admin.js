@@ -2,21 +2,12 @@ const Booking = require('../models/Booking');
 const Service = require('../models/Service');
 const User = require('../models/User');
 const authService = require('../services/authService');
+const emailService = require('../services/emailService');
 
 // Create a service
 exports.createService = async (req, res) => {
-    const { title, category, pricePerDay, description, availabilityDates, location, contactDetails } = req.body;
-
-    // Validate required fields
-    if (!title || !category || !pricePerDay || !description || !availabilityDates || !location || !contactDetails) {
-        return res.status(400).json({ message: 'All fields are required.' });
-    }
-
-    // Validate price
-    if (pricePerDay <= 0) {
-        return res.status(400).json({ message: 'Price per day must be greater than zero.' });
-    }
-
+    const { title, category, pricePerDay, description, availableDates, location, contactDetails } = req.body;
+    console.log(req.body)
     try {
         // Create the service
         const service = await Service.create({
@@ -24,7 +15,7 @@ exports.createService = async (req, res) => {
             category,
             pricePerDay,
             description,
-            availabilityDates,
+            availableDates,
             location,
             contactDetails,
             createdBy: req.userId
@@ -39,7 +30,6 @@ exports.createService = async (req, res) => {
 exports.editService = async (req, res) => {
     const { serviceId } = req.params; // Service ID from the request params
     const updateData = req.body; // Data to update, could be one or more fields
-    // TODO add a checke of serviceId
     try {
         // Find and update the service with only the fields that are provided in the request body
         const service = await Service.findOneAndUpdate({ _id: serviceId, createdBy: req.userId }, updateData, { new: true });
@@ -67,29 +57,21 @@ exports.deleteService = async (req, res) => {
 
     try {
         
-        const service = await Service.findOneAndDelete({ _id: serviceId, createdBy: userId });
+        // const service = await Service.findOneAndDelete({ _id: serviceId, createdBy: userId });
 
-        if (!service) {
-            return res.status(404).json({ message: 'Service not found.' });
-        }
+        // if (!service) {
+        //     return res.status(404).json({ message: 'Service not found.' });
+        // }
 
-        const bookings = await Booking.find({ serviceId }).populate('userId');
+        const bookings = await Booking.find({ serviceId }).populate('userId').populate('serviceId');
 
         await Booking.updateMany({ serviceId }, { status: 'canceled' });
-
-        // Initiate refunds for each booking
        
             try {
-                // Assuming you have a paymentService that handles refunds
-                // await paymentService.initiateRefund(booking._id, booking.totalPrice);
-
-                // // Send refund email to the user
-                // await emailService.sendRefundNotification({
-                //     bookings
-                // });
+                    await emailService.sendEventCancellation(bookings)
 
             } catch (error) {
-                console.error(`Failed to process refund for booking ${booking._id}: ${error.message}`);
+                console.error(error);
             }
         
 
@@ -100,21 +82,22 @@ exports.deleteService = async (req, res) => {
 };
 
 exports.getAllBooking = async (req, res) => {
-    const createdBy = req.userId;
-    const { page = 1, limit = 10, sortBy = 'bookingDate', sortOrder = 'asc' } = req.query; // Add query parameters
+    const adminId = req.userId; // Assuming req.userId is the admin ID
+    const { page = 1, limit = 10, sortBy = 'bookingDate', sortOrder = 'asc' } = req.query;
 
     try {
         const sortOptions = {};
-        sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1; // Set sorting order
+        sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
-        const bookings = await Booking.find({ createdBy })
-            .populate('serviceId')
+        // Find bookings where adminId matches the logged-in user's ID
+        const bookings = await Booking.find({ adminId }) // Filter bookings by adminId
+            .populate('serviceId') // Populate serviceId to access service details
             .sort(sortOptions) // Apply sorting
-            .skip((page - 1) * limit) // Calculate how many documents to skip
-            .limit(Number(limit)); // Limit the number of results
+            .skip((page - 1) * limit) // Pagination: skip results
+            .limit(Number(limit)); // Pagination: limit results
 
-        // Optionally, get the total count of bookings
-        const totalBookings = await Booking.countDocuments({ createdBy });
+        // Optionally, get the total count of filtered bookings
+        const totalBookings = await Booking.countDocuments({ adminId });
         const totalPages = Math.ceil(totalBookings / limit);
 
         res.status(200).json({
@@ -126,6 +109,8 @@ exports.getAllBooking = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
+
 
 exports.signup = async (req, res) => {
     const { name, email, password } = req.body;

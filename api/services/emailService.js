@@ -34,12 +34,13 @@ class EmailService {
         }
     }
     async sendEventCancellation(bookings) {
-        
-        // for (const booking of bookings) {
-        //     const htmlContent = eventCancellationEmail(booking);
-        //     await this.sendEmail(booking.userId.email, "Event Cancelled", htmlContent);
-        //     await new Promise(resolve => setTimeout(resolve, 2000)); 
-        // }
+        for (const booking of bookings) {
+            const htmlContent = eventCancellationEmail(booking);
+            console.log(booking.userId.email,booking);
+            
+            await this.sendEmail(booking.userId.email, "Event Cancelled", htmlContent);
+            await new Promise(resolve => setTimeout(resolve, 2000)); 
+        }
     }
 
     async sendBookingConfirmation(bookingDetails) {

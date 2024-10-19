@@ -2,11 +2,13 @@ const Service = require('../models/Service');
 const Booking = require('../models/Booking');
 const emailService = require('../services/emailService');
 const User = require('../models/User');
+const bookingService = require('../services/bookingService');
 
 exports.createBooking = async (req, res) => {
     const { serviceId, bookingDates } = req.body; 
     const numberOfDays = bookingDates.length;
     const userId = req.userId;
+
     try {
         const service = await Service.findById(serviceId);
         if (!service) {
@@ -14,11 +16,11 @@ exports.createBooking = async (req, res) => {
         }
 
         // Normalize dates to YYYY-MM-DD format for comparison
-        const normalizedBookingDates = bookingDates.map((date) => new Date(date).toISOString().split('T')[0]);
-        const normalizedAvailableDates = service.availableDates.map((date) => new Date(date).toISOString().split('T')[0]);
+        const normalizedBookingDates = bookingService.normalizeDates(bookingDates);  
+        const normalizedAvailableDates = bookingService.normalizeDates(service.availableDates); 
 
         // Check for date availability
-        const unavailableDates = normalizedBookingDates.filter((date) => !normalizedAvailableDates.includes(date));
+        const unavailableDates = bookingService.compareDates(normalizedBookingDates, normalizedAvailableDates);
         if (unavailableDates.length > 0) {
             return res.status(400).json({
                 message: 'Some booking dates are not available',
@@ -28,24 +30,26 @@ exports.createBooking = async (req, res) => {
         }
 
         // Update the service's available dates
-        service.availableDates = normalizedAvailableDates.filter((date) => !normalizedBookingDates.includes(date));
+        service.availableDates = bookingService.compareDates(normalizedAvailableDates, normalizedBookingDates);
         await service.save(); // Save the updated service
 
         const booking = new Booking({
             userId,
             serviceId,
-            bookingDates: normalizedBookingDates, // store normalized booking dates
-            totalPrice: service.pricePerDay * numberOfDays 
+            bookingDates: normalizedBookingDates, // Store normalized booking dates
+            totalPrice: service.pricePerDay * numberOfDays,
+            adminId: service.createdBy // Set adminId to service's createdBy
         });
 
         let newBooking = await booking.save();
-        newBooking = await newBooking.populate(['serviceId', 'userId']);
+        newBooking = await newBooking.populate(['serviceId', 'userId', 'adminId']); // Populate adminId if needed
         await emailService.sendBookingConfirmation(newBooking);
         res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
 exports.getUserBookings = async (req, res) => {
     const userId = req.userId;
     const { page = 1, limit = 10, sortBy = 'bookingDate', sortOrder = 'asc' } = req.query; // Add query parameters

@@ -1,32 +1,6 @@
 const Service = require('../models/Service');
 const Booking = require('../models/Booking');
 
-// Get all services
-// exports.getAllServices = async (req, res) => {
-//     try {
-//         const { page = 1, limit = 10, sortBy = 'pricePerDay', sortOrder = 'asc' } = req.query;
-
-//         const sortOptions = {};
-//         sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1; // 1 for ascending, -1 for descending
-
-//         const services = await Service.find()
-//             .sort(sortOptions)
-//             .skip((page - 1) * limit) // Calculate how many documents to skip
-//             .limit(Number(limit)); // Limit the number of results
-
-//         // Optionally, you might want to get the total count of services
-//         const totalServices = await Service.countDocuments();
-//         const totalPages = Math.ceil(totalServices / limit);
-
-//         res.status(200).json({
-//             totalPages,
-//             currentPage: Number(page),
-//             services,
-//         });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Server error', error: error.message });
-//     }
-// };
 
 
 exports.getUserBookings = async (req, res) => {
@@ -41,10 +15,11 @@ exports.getUserBookings = async (req, res) => {
 };
 
 exports.filterServices = async (req, res) => {
-    const { minPrice, maxPrice, category, location, bookingDate, page = 1, limit = 10, sortBy = 'pricePerDay', sortOrder = 'asc' } = req.query;
+    const { minPrice, maxPrice, category, location, startDate, endDate, page = 1, limit = 10, sortBy = 'pricePerDay', sortOrder = 'asc' } = req.query;
 
     const query = {};
-  
+
+    // Price range filter
     if (minPrice || maxPrice) {
         query.pricePerDay = {};
         if (minPrice) {
@@ -54,24 +29,47 @@ exports.filterServices = async (req, res) => {
             query.pricePerDay.$lte = Number(maxPrice);
         }
     }
-  
+
+    // Category filter
     if (category) {
-        query.category = category;
+        query.category = { $regex: new RegExp(category, 'i') };
     }
-  
+
+    // Location filter
     if (location) {
-        query.location = location;
+        query.location = { $regex: new RegExp(location, 'i') };
     }
-  
-    if (bookingDate) {
-        const date = new Date(bookingDate);
-        query.availableDates = { $elemMatch: { $gte: date } }; // Check if the booking date is available
+
+    // Date filtering logic
+    const today = new Date();
+
+    if (startDate && !endDate) {
+        const start = new Date(startDate);
+        if (start >= today) {
+            query.availableDates = { $elemMatch: { $gte: start } }; // Show services from startDate if it's today or future
+        } else {
+            query.availableDates = { $elemMatch: { $gte: today } }; // If startDate is in the past, show services from today onwards
+        }
+    } else if (!startDate && endDate) {
+        const end = new Date(endDate);
+        query.availableDates = { $elemMatch: { $gte: today, $lte: end } }; // Show services from today to endDate
+    } else if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        if (start >= today) {
+            query.availableDates = {
+                $elemMatch: { $gte: start, $lte: end } // Show services between startDate and endDate if startDate is valid
+            };
+        } else {
+            query.availableDates = { $elemMatch: { $gte: today, $lte: end } }; // If startDate is in the past, show services from today to endDate
+        }
     }
-  
+
     try {
         const sortOptions = {};
         sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1; // Sorting order
 
+        // Find and paginate the services
         const services = await Service.find(query)
             .sort(sortOptions)
             .skip((page - 1) * limit)
@@ -95,17 +93,6 @@ exports.filterServices = async (req, res) => {
 
 exports.createService = async (req, res) => {
     const { title, category, pricePerDay, description, availabilityDates, location, contactDetails } = req.body;
-    
-    // Validate required fields
-    if (!title || !category || !pricePerDay || !description || !availabilityDates || !location || !contactDetails) {
-        return res.status(400).json({ message: 'All fields are required.' });
-    }
-
-    // Validate price
-    if (pricePerDay <= 0) {
-        return res.status(400).json({ message: 'Price per day must be greater than zero.' });
-    }
-
     try {
         // Create the service
         const service = await Service.create({

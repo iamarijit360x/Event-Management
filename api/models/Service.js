@@ -15,7 +15,21 @@ const contactSchema = new mongoose.Schema({
 
 const serviceSchema = new mongoose.Schema({
     title: { type: String, required: true },
-    category: { type: String, required: true },
+    category: { type: String,enum:[
+        'marriageVenues',
+        'hotels',
+        'caterers',
+        'cateringEquipmentcaRentals',
+        'cameramen',
+        'dJs',
+        'eventPlanners',
+        'florists',
+        'soundAndLighting',
+        'makeupArtists',
+        'bakers',
+        'securityServices',
+        'venueDecorationServices',
+    ],required: true },
     pricePerDay: { type: Number, required: true, min: 0 }, 
     description: { type: String },
     availableDates: [Date],
