@@ -41,11 +41,11 @@ This project is a backend system for an event booking platform that allows users
 2. Navigate to the project directory: `cd Event-Management/api`
 3. Install the dependencies: `npm install`
 4. Create a `.env` file in the `api` directory and set the following variables: 
-    DB_URL=mongodb://127.0.0.1:27017/Event-management 
-    EMAIL='your-email' EMAIL_PASSWORD='your-password' 
-    SECRET='your-secret-key' (you can generate this using the following command `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))" `) 
-    EMAIL_CC='abc@gmail.com' 
-    PORT=3015
+    - DB_URL=mongodb://127.0.0.1:27017/Event-management 
+    - EMAIL='your-email' EMAIL_PASSWORD='your-password' 
+    - SECRET='your-secret-key' (you can generate this using the following command `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))" `) 
+    - EMAIL_CC='abc@gmail.com' 
+    - PORT=3015
 5. Connect to your MongoDB.
 
 ## Running the Application
