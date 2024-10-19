@@ -1,72 +1,53 @@
 # Event Booking Platform
 
-## Description
+## Overview
+This project is a backend system for an event booking platform that allows users to book services such as venues, hotels, caterers, cameramen, DJs, etc. The platform includes user and admin features for managing bookings and services.
 
-This project is a backend system for an event booking platform built with Node.js and Express.js. It allows users to search for and book services like venues, hotels, caterers, cameramen, and DJs. An admin interface is provided for service providers to manage their offerings.
+## Technology Stack
+- **Node.js**
+- **Express.js**
+- **MongoDB** (or any relational database like PostgreSQL/MySQL)
+- **JWT** for authentication
+- **dotenv** for environment variable management
+- **body-parser** for parsing incoming request bodies
+- **cors** for handling Cross-Origin Resource Sharing
 
 ## Features
-
 ### User Features
-- **User Registration & Authentication:** 
-  - Users can sign up and log in.
-  - User passwords are stored securely using hashing.
-  
-- **Event Booking:**
-  - Search for services with filters for:
-    - Price range
-    - Service category
-    - Location
-    - Availability (date-based filter)
-  - Each service displays:
-    - Description
-    - Pricing
-    - Availability status
-    - Contact information
-  - Users can book services for specific dates, with confirmations stored in the database.
-
-- **View Bookings:**
-  - Users can view their past and upcoming bookings.
+- User registration and authentication (passwords are securely hashed)
+- Search for services (venues, hotels, caterers, etc.)
+- Filter services by:
+  - Price range
+  - Service category
+  - Location
+  - Availability
+- View service details (description, pricing, availability, contact information)
+- Book services for specific dates
+- View past and upcoming bookings
 
 ### Admin Features
-- **Admin Login & Authentication:** 
-  - Admins can log in to manage the platform.
-  
-- **Service Management:**
-  - Add, edit, or remove services.
-  - Each service includes:
-    - Title
-    - Category (venue, caterer, DJ, etc.)
-    - Price per day
-    - Description
-    - Availability dates
-    - Contact details
-  - Admins can view all bookings for their services.
+- Admin login and authentication
+- Manage services (add, edit, remove)
+- View all bookings for services
 
 ### Other Functionalities
-- **Search & Filter:** 
-  - Search services based on keywords and apply multiple filters.
-  
-- **Price Calculation:** 
-  - Calculate total price based on the number of days booked.
+- Search and filter services
+- Calculate total booking price based on duration
+- Implement pagination and sorting for the services list
+- Send email notifications for booking confirmations
 
-## Technologies Used
-- Node.js
-- Express.js
-- MongoDB (or any preferred relational database)
-- JSON Web Token (JWT) for authentication
-- Swagger or Postman for API documentation
+## Installation
+1. Clone the repository: `git clone https://github.com/iamarijit360x/Event-Management.git`
+2. Navigate to the project directory: `cd Event-Management/api`
+3. Install the dependencies: `npm install`
+4. Create a `.env` file in the `api` directory and set the following variables: 
+    DB_URL=mongodb://127.0.0.1:27017/Event-management 
+    EMAIL='your-email' EMAIL_PASSWORD='your-password' 
+    SECRET='your-secret-key' (you can generate this using the following command `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))" `) 
+    EMAIL_CC='abc@gmail.com' 
+    PORT=3015
+5. Connect to your MongoDB.
 
-## Getting Started
-
-### Prerequisites
-- Node.js (version X.X.X)
-- MongoDB or a relational database (PostgreSQL, MySQL)
-- npm (Node Package Manager)
-
-### Installation
-1. Clone the repository:
-2. Create .evn file in the api according to the .env.example
-3. cd api
-4.npm install
-5.npm run dev
-
+## Running the Application
+To start the server, run: `npm run dev`
+The server will be running on [http://localhost:3015](http://localhost:3015).
