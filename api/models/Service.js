@@ -21,8 +21,9 @@ const serviceSchema = new mongoose.Schema({
     availableDates: [Date],
     location: { type: String, required: true },
     contactDetails: contactSchema,
-    createdBy: { type: mongoose.Schema.Types.ObjectId,ref:'User',required: true }
-});
+    createdBy: { type: mongoose.Schema.Types.ObjectId,ref:'User',required: true },
+    status: { type: String,enum:['active','cancelled'],default: 'active' }, 
+},{timestamps:true});
 
 // Optionally add indexes
 serviceSchema.index({ category: 1, location: 1 });

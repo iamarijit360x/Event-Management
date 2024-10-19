@@ -11,14 +11,14 @@ class AuthService {
             isAdmin: user.isAdmin
         };
         return jwt.sign(payload, process.env.SECRET, {
-            expiresIn: '1h'
+            expiresIn: '72h'
         });
     }
     async createUser(name, email, password, isAdmin = false) {
         try {
             const user = await User.create({ name, email, password, isAdmin });
             const token = await this.generateToken(user);
-            return { token, user }; // Return both token and user information (optional)
+            return { token };
         } catch (error) {
             console.log(error);
             

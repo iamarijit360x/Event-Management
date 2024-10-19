@@ -4,7 +4,9 @@ const formatDate = (dateString) => {
 };
 
 const bookingConfirmationEmail = (bookingData) => {
-    const { serviceId, bookingDates, totalPrice, userId } = bookingData;
+    console.log(bookingData);
+    
+    const { serviceId, bookingDates, totalPrice, userId,location } = bookingData;
     const formattedDates = bookingDates.map((date) => formatDate(date)).join(' - ');
 
     return `<!DOCTYPE html>
@@ -109,7 +111,8 @@ const bookingConfirmationEmail = (bookingData) => {
                 <p><strong>Contact:</strong> ${serviceId?.contactDetails?.email} | ${serviceId.contactDetails?.phone}</p>
             </div>
             <div class="content">
-                <a href="https://calendar.google.com" class="cta">Add to Google Calendar</a>
+                <a 
+                href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=${bookingData?.title}&dates=START_DATE/END_DATE&details=${bookingData?.details}&location=${bookingData?.location}" class="cta">Add to Google Calendar</a>
             </div>
             <div class="footer">
                 <p>&copy; 2024 Your Company. All rights reserved.</p>

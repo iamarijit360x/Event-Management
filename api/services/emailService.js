@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 const bookingConfirmationEmail = require('../template/bookingConfirmation');
+const eventCancellationEmail = require('../template/eventCancel');
 
 dotenv.config();
 
@@ -31,6 +32,14 @@ class EmailService {
             console.error('Error sending booking confirmation email:', error);
             throw new Error('Email sending failed');
         }
+    }
+    async sendEventCancellation(bookings) {
+        
+        // for (const booking of bookings) {
+        //     const htmlContent = eventCancellationEmail(booking);
+        //     await this.sendEmail(booking.userId.email, "Event Cancelled", htmlContent);
+        //     await new Promise(resolve => setTimeout(resolve, 2000)); 
+        // }
     }
 
     async sendBookingConfirmation(bookingDetails) {

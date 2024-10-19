@@ -9,7 +9,6 @@ const router = express.Router();
 
 router.use(verifyUser);
 router.get('/', filterServices);
-router.use(verifyAdmin);
-router.post('/', serviceValidator, validateRequest, createService);
+
 
 module.exports = router;

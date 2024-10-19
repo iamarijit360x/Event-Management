@@ -7,11 +7,6 @@ exports.createBooking = async (req, res) => {
     const { serviceId, bookingDates } = req.body; 
     const numberOfDays = bookingDates.length;
     const userId = req.userId;
-
-    if (!serviceId || !bookingDates || numberOfDays === 0) {
-        return res.status(400).json({ message: 'Invalid request: serviceId and bookingDates are required.' });
-    }
-
     try {
         const service = await Service.findById(serviceId);
         if (!service) {
@@ -45,7 +40,6 @@ exports.createBooking = async (req, res) => {
 
         let newBooking = await booking.save();
         newBooking = await newBooking.populate(['serviceId', 'userId']);
-        console.log(newBooking);        
         await emailService.sendBookingConfirmation(newBooking);
         res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
     } catch (error) {
