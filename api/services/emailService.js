@@ -38,8 +38,8 @@ class EmailService {
             const htmlContent = eventCancellationEmail(booking);
             console.log(booking.userId.email,booking);
             
-            await this.sendEmail(booking.userId.email, "Event Cancelled", htmlContent);
-            await new Promise(resolve => setTimeout(resolve, 2000)); 
+            await this.sendEmail(booking.userId.email, 'Event Cancelled', htmlContent);
+            await new Promise((resolve) => setTimeout(resolve, 2000)); 
         }
     }
 

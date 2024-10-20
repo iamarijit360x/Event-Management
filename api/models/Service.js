@@ -27,6 +27,7 @@ const serviceSchema = new mongoose.Schema({
         'soundAndLighting',
         'makeupArtists',
         'bakers',
+        'cooking',
         'securityServices',
         'venueDecorationServices',
     ],required: true },

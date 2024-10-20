@@ -29,9 +29,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/service', serviceRouter);
 app.use('/api/booking', bookingRouter);
 
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something went wrong!');
+app.use((error, req, res, next) => {
+    res.status(500).send({message:'Server Error',error});
 });
 
 app.listen(port, () => console.log(`Server listening on port ${port}`));

@@ -3,7 +3,6 @@ const Booking = require('../models/Booking');
 const emailService = require('../services/emailService');
 const User = require('../models/User');
 const bookingService = require('../services/bookingService');
-
 exports.createBooking = async (req, res) => {
     const { serviceId, bookingDates } = req.body; 
     const numberOfDays = bookingDates.length;
@@ -22,7 +21,7 @@ exports.createBooking = async (req, res) => {
         // Check for date availability
         const unavailableDates = bookingService.compareDates(normalizedBookingDates, normalizedAvailableDates);
         if (unavailableDates.length > 0) {
-            return res.status(400).json({
+            return res.status(409).json({
                 message: 'Some booking dates are not available',
                 unavailableDates,
                 availableDates: normalizedAvailableDates
@@ -42,7 +41,14 @@ exports.createBooking = async (req, res) => {
         });
 
         let newBooking = await booking.save();
-        newBooking = await newBooking.populate(['serviceId', 'userId', 'adminId']); // Populate adminId if needed
+
+        // Populate specific fields from serviceId and userId
+        newBooking = await newBooking.populate([
+            { path: 'serviceId', select: 'title pricePerDay contactDetails location description' }, 
+            { path: 'userId', select: 'name email' }, 
+            { path: 'adminId', select: 'name email' } 
+        ]);
+
         await emailService.sendBookingConfirmation(newBooking);
         res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
     } catch (error) {

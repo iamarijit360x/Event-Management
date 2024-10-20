@@ -7,7 +7,7 @@ const emailService = require('../services/emailService');
 // Create a service
 exports.createService = async (req, res) => {
     const { title, category, pricePerDay, description, availableDates, location, contactDetails } = req.body;
-    console.log(req.body)
+    console.log(req.body);
     try {
         // Create the service
         const service = await Service.create({
@@ -47,35 +47,34 @@ exports.editService = async (req, res) => {
 };
 
 exports.deleteService = async (req, res) => {
-        //1. Find and delete the service
-        //2. If no service found, return an error
-        //3. Find all bookings related to the service
-        //4. Mark all bookings as canceled for the deleted service
     const { serviceId } = req.params; 
-    const userId = req.userId
-    console.log(userId);
+    const userId = req.userId; // Assuming this is the authenticated user ID (admin)
 
     try {
-        
-        // const service = await Service.findOneAndDelete({ _id: serviceId, createdBy: userId });
+        // 1. Find the service first without deleting
+        const service = await Service.findOne({ _id: serviceId, createdBy: userId });
 
-        // if (!service) {
-        //     return res.status(404).json({ message: 'Service not found.' });
-        // }
+        if (!service) {
+            return res.status(404).json({ message: 'Service not found.' });
+        }
 
+        // 2. Find all bookings related to the service
         const bookings = await Booking.find({ serviceId }).populate('userId').populate('serviceId');
 
+        // 3. Mark all bookings as canceled
         await Booking.updateMany({ serviceId }, { status: 'canceled' });
-       
-            try {
-                    await emailService.sendEventCancellation(bookings)
 
-            } catch (error) {
-                console.error(error);
-            }
-        
+        // 4. Send cancellation emails to users
+        try {
+            await emailService.sendEventCancellation(bookings);
+        } catch (error) {
+            console.error('Error sending cancellation emails:', error);
+        }
 
-        res.status(200).json({ message: 'Service deleted, associated bookings canceled, and refund emails sent.' });
+        // 5. After handling bookings, delete the service
+        await Service.findOneAndDelete({ _id: serviceId, createdBy: userId });
+
+        res.status(200).json({ message: 'Service deleted, associated bookings canceled, and cancellation emails sent.' });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -103,23 +102,22 @@ exports.getAllBooking = async (req, res) => {
         res.status(200).json({
             totalPages,
             currentPage: Number(page),
-            bookings,
+            bookings
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
-
-
 exports.signup = async (req, res) => {
     const { name, email, password } = req.body;
     try {
-        const obj = await authService.createUser(name, email, password, true)
-        obj.message = 'Account Created Successfully'
-        return res.status(201).json(obj)
+        const obj = await authService.createUser(name, email, password, true);
+        obj.message = 'Account Created Successfully';
+        obj.isAdmin=true;
+        return res.status(201).json(obj);
     } catch (error) {
-        return res.status(error.status).json(error)
+        return res.status(error.status).json(error);
     }
 
 };

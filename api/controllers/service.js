@@ -16,6 +16,34 @@ exports.getUserBookings = async (req, res) => {
 
 exports.filterServices = async (req, res) => {
     const { minPrice, maxPrice, category, location, startDate, endDate, page = 1, limit = 10, sortBy = 'pricePerDay', sortOrder = 'asc' } = req.query;
+    
+    // Function to convert DD-MM-YYYY to valid Date object
+    const parseDate = (dateStr) => {
+        const [day, month, year] = dateStr.split('-');
+        const parsedDate = new Date(`${year}-${month}-${day}`);
+        
+        // Check if the parsed date is valid
+        return isNaN(parsedDate.getTime()) ? null : parsedDate;
+    };
+
+    // Validate dates
+    const start = startDate ? parseDate(startDate) : null;
+    const end = endDate ? parseDate(endDate) : null;
+
+    if ((startDate && !start) || (endDate && !end)) {
+        return res.status(400).json({
+            message: 'Invalid date format',
+            error: 'Dates must be in DD-MM-YYYY format and must be valid dates.'
+        });
+    }
+
+    // Validate minPrice and maxPrice
+    if ((minPrice && isNaN(minPrice)) || (maxPrice && isNaN(maxPrice))) {
+        return res.status(400).json({
+            message: 'Invalid price format',
+            error: 'minPrice and maxPrice must be valid numbers.'
+        });
+    }
 
     const query = {};
 
@@ -43,31 +71,27 @@ exports.filterServices = async (req, res) => {
     // Date filtering logic
     const today = new Date();
 
-    if (startDate && !endDate) {
-        const start = new Date(startDate);
-        if (start >= today) {
-            query.availableDates = { $elemMatch: { $gte: start } }; // Show services from startDate if it's today or future
-        } else {
-            query.availableDates = { $elemMatch: { $gte: today } }; // If startDate is in the past, show services from today onwards
-        }
-    } else if (!startDate && endDate) {
-        const end = new Date(endDate);
-        query.availableDates = { $elemMatch: { $gte: today, $lte: end } }; // Show services from today to endDate
-    } else if (startDate && endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        if (start >= today) {
-            query.availableDates = {
-                $elemMatch: { $gte: start, $lte: end } // Show services between startDate and endDate if startDate is valid
-            };
-        } else {
-            query.availableDates = { $elemMatch: { $gte: today, $lte: end } }; // If startDate is in the past, show services from today to endDate
-        }
-    }
-
     try {
+        if (start && !end) {
+            if (start >= today) {
+                query.availableDates = { $elemMatch: { $gte: start } };
+            } else {
+                query.availableDates = { $elemMatch: { $gte: today } };
+            }
+        } else if (!start && end) {
+            query.availableDates = { $elemMatch: { $gte: today, $lte: end } };
+        } else if (start && end) {
+            if (start >= today) {
+                query.availableDates = {
+                    $elemMatch: { $gte: start, $lte: end }
+                };
+            } else {
+                query.availableDates = { $elemMatch: { $gte: today, $lte: end } };
+            }
+        }
+
         const sortOptions = {};
-        sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1; // Sorting order
+        sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
         // Find and paginate the services
         const services = await Service.find(query)
@@ -88,6 +112,7 @@ exports.filterServices = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
 
 
 
