@@ -51,3 +51,5 @@ This project is a backend system for an event booking platform that allows users
 ## Running the Application
 To start the server, run: `npm run dev`
 The server will be running on [http://localhost:3015](http://localhost:3015).
+## Testing the Application
+1.run `npm test`
