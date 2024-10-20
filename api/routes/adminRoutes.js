@@ -1,11 +1,22 @@
-import express from 'express';
-import validateRequest from '../middlewares/validatorMiddleware.mjs';
-import serviceValidator from '../validators/serviceValidator.mjs';
-import { createService } from '../controllers/admin.mjs';
-import { verifyAdmin, verifyUser } from '../middlewares/authMiddleware.mjs';
+const express = require('express');
+const validateRequest = require('../middlewares/validatorMiddleware');
+const serviceValidator = require('../validators/serviceValidator');
+const { createService, getAllBooking,signup, editService, deleteService } = require('../controllers/admin');
+const { verifyAdmin, verifyUser } = require('../middlewares/authMiddleware');
+const { validateSignup } = require('../validators/loginValidator');
+const { validateEditService } = require('../validators/serviceValidatorEdit');
+const { validateDeleteService } = require('../validators/deleteServiceValidator');
+
 const router = express.Router();
+//Unprotected Route for admin
+router.post('/auth/signup', validateSignup, validateRequest, signup);
 router.use(verifyUser);
 router.use(verifyAdmin);
-router.post('/create-service',serviceValidator,validateRequest,createService);
+//protected Routes for admin
+router.post('/service', serviceValidator, validateRequest, createService);
+router.put('/service/:serviceId',validateEditService, validateRequest,editService);
+router.delete('/service/:serviceId',validateDeleteService, validateRequest,deleteService);
+router.get('/booking', getAllBooking);
 
-export default router;
+
+module.exports = router;

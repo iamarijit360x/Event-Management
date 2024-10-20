@@ -1,12 +1,13 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false }
-});
+},{timestamps:true});
+
 // Password hashing
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
@@ -14,5 +15,6 @@ userSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
     next();
 });
+
 const User = mongoose.model('User', userSchema);
-export default User;
+module.exports = User;

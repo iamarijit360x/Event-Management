@@ -1,10 +1,11 @@
-import express from 'express';
-import { signin, signup } from '../controllers/auth.mjs';
-import { validateSignin, validateSignup } from '../validators/loginValidator.mjs';
-import validateRequest from '../middlewares/validatorMiddleware.mjs';
+const express = require('express');
+const { signin, signup } = require('../controllers/auth');
+const { validateSignin, validateSignup } = require('../validators/loginValidator');
+const validateRequest = require('../middlewares/validatorMiddleware');
+
 const router = express.Router();
 
-router.post('/signin',validateSignin,validateRequest,signin);
-router.post('/signup',validateSignup,validateRequest,signup);
+router.post('/signin', validateSignin, validateRequest, signin);
+router.post('/signup', validateSignup, validateRequest, signup);
 
-export default router;
+module.exports = router;

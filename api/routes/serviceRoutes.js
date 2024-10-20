@@ -1,14 +1,14 @@
-import express from 'express';
-import serviceValidator from '../validators/serviceValidator.mjs';
-import { filterServices, getAllServices } from '../controllers/service.mjs';
-import { verifyUser,verifyAdmin} from '../middlewares/authMiddleware.mjs';
-import validateRequest from '../middlewares/validatorMiddleware.mjs';
-import { createService } from '../controllers/admin.mjs';
+const express = require('express');
+const serviceValidator = require('../validators/serviceValidator');
+const { filterServices,createService} = require('../controllers/service');
+const { verifyUser, verifyAdmin } = require('../middlewares/authMiddleware');
+const validateRequest = require('../middlewares/validatorMiddleware');
+const {  } = require('../controllers/admin');
+
 const router = express.Router();
 
 router.use(verifyUser);
-// router.get('/',serviceValidator,getAllServices);
-router.get('/',filterServices);
-router.use(verifyAdmin);
-router.post('/',serviceValidator,validateRequest,createService);
-export default router;
+router.get('/', filterServices);
+
+
+module.exports = router;

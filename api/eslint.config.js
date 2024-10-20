@@ -1,13 +1,13 @@
-import { defineConfig } from 'eslint-define-config';
-import globals from 'globals';
+const { defineConfig } = require('eslint-define-config');
+const globals = require('globals');
 
-export default defineConfig({
+module.exports = defineConfig({
     languageOptions: {
         globals: {
             ...globals.browser, // Add browser globals if needed
             process: true,      // Add Node.js globals
             __dirname: true,    // Add more globals as needed
-            module: true       // For Node.js modules
+            module: true        // For Node.js modules
         },
         parserOptions: {
             ecmaVersion: 2021,  // Specify ECMAScript version (2021 / ES12)
