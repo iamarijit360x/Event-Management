@@ -1,4 +1,5 @@
 # Event Booking Platform
+Documentation link: [Click Here](https://github.com/username/repository-name](https://docs.google.com/document/d/1Vfga3JkGtsqLixfphA_O2wdbQb4rKne5eR3wHyY05-I/edit?tab=t.0#heading=h.k0viym8mh1o3))
 
 ## Overview
 This project is a backend system for an event booking platform that allows users to book services such as venues, hotels, caterers, cameramen, DJs, etc. The platform includes user and admin features for managing bookings and services.
