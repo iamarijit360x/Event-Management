@@ -15,7 +15,6 @@ exports.verifyUser = async (req, res, next) => {
             req.isAdmin = !!decoded.isAdmin;
             return next();
         } catch (err) {
-            console.log(err);
             return res.status(401).json({ message: 'Unauthorized. You need to login' });
         }
     } catch (err) {

@@ -14,7 +14,9 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // Connect to MongoDB
-connection();
+if (process.env.NODE_ENV !== 'test') {
+    connection(); // Connect only if not in test mode
+}
 
 // Use cors middleware
 app.use(cors());
@@ -32,6 +34,8 @@ app.use('/api/booking', bookingRouter);
 app.use((error, req, res, next) => {
     res.status(500).send({message:'Server Error',error});
 });
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(port, () => console.log(`Server listening on port ${port}`));
+}
 
-app.listen(port, () => console.log(`Server listening on port ${port}`));
 module.exports = app;

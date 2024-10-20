@@ -9,7 +9,7 @@ const { validateDeleteService } = require('../validators/deleteServiceValidator'
 
 const router = express.Router();
 //Unprotected Route for admin
-router.post('auth/signup', validateSignup, validateRequest, signup);
+router.post('/auth/signup', validateSignup, validateRequest, signup);
 router.use(verifyUser);
 router.use(verifyAdmin);
 //protected Routes for admin

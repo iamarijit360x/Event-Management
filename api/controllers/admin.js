@@ -7,7 +7,6 @@ const emailService = require('../services/emailService');
 // Create a service
 exports.createService = async (req, res) => {
     const { title, category, pricePerDay, description, availableDates, location, contactDetails } = req.body;
-    console.log(req.body);
     try {
         // Create the service
         const service = await Service.create({

@@ -52,6 +52,7 @@ exports.createBooking = async (req, res) => {
         await emailService.sendBookingConfirmation(newBooking);
         res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };

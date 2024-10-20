@@ -186,7 +186,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3015/api/admin/signup",
+					"raw": "http://localhost:3015/api/admin//auth/signup",
 					"protocol": "http",
 					"host": [
 						"localhost"

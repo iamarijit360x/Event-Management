@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
     "lint": "eslint .",
-    "dev": "npx nodemon app.js"
+    "dev": "npx nodemon app.js",
+    "test": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +26,7 @@
     "nodemailer": "^6.9.15"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "^9.12.0",
     "eslint-define-config": "^2.1.0",
     "globals": "^15.11.0",
